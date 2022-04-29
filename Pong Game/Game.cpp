@@ -23,7 +23,7 @@ void Game::run() {
 }
 
 void Game::mainLoop() {
-	ball.setVelocity(700, 700);
+	ball.setVelocity(400, 400);
 	while (state == State::GAME) {
 		event();
 		updateWorld();
@@ -49,6 +49,7 @@ void Game::draw() {
 	window.drawBackground();
 	window.drawString(5, 2, "GAME", 40, Fonts::ARIAL, { 255, 255, 255 });
 	ball.draw();
+	bumper.draw();
 	window.update();
 }
 
@@ -74,6 +75,12 @@ void Game::event() {
 			case SDLK_ESCAPE:
 				state = State::EXIT;
 				break;
+			case SDLK_d:
+				bumper.setVelocity(300, 0);
+				break;
+			case SDLK_a:
+				bumper.setVelocity(-300, 0);
+				break;
 			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -81,10 +88,15 @@ void Game::event() {
 		case SDL_MOUSEBUTTONUP:
 			break;
 		case SDL_KEYUP:
-			break;
-		case SDL_QUIT:
-			state = State::EXIT;
-			break;
+			switch (event.key.keysym.sym) {
+			case SDLK_d:
+				break;
+			case SDLK_a:
+				break;
+			case SDL_QUIT:
+				state = State::EXIT;
+				break;
+			}
 		};
 	};
 }
@@ -133,5 +145,6 @@ void Game::eventMenu() {
 }
 void Game::updateWorld() {
 	ball.move();
+	bumper.move();
 	timer.tick();
 }

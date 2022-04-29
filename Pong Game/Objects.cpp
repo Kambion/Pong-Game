@@ -24,6 +24,10 @@ void Object::bounce(Direction direction) {
 void Ball::draw() {
 	window.drawCircle(position.x, position.y, radius, radius+1, window.colors.blue);
 }
+void Bumper::draw() {
+	window.drawRectangle(SDL_Rect{ (int)position.x, (int)position.y, width, height }, window.colors.red);
+	window.drawCircle(position.x, position.y, 3, 3, window.colors.green);
+}
 void Ball::checkBorder() {
 	if (position.x < radius && velocity.velX < 0) {
 		bounce(Direction::HORIZONTAL);
@@ -36,5 +40,13 @@ void Ball::checkBorder() {
 	}
 	if (position.y > window.height() - radius && velocity.velY > 0) {
 		bounce(Direction::VERTICAL);
+	}
+}
+void Bumper::checkBorder() {
+	if (position.x < 10 && velocity.velX < 0) {
+		velocity.velX = 0;
+	}
+	if (position.x + width > window.width() - 10 && velocity.velX > 0) {
+		velocity.velX = 0;
 	}
 }

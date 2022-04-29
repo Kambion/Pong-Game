@@ -48,3 +48,12 @@ public:
 	Ball(double x, double y, int radius, Timer& timer, SDLWindow& window) : Object(x, y, timer, window), radius(radius) {}
 	void draw() override;
 };
+
+class Bumper : public Object {
+private:
+	int width, height;
+	void checkBorder() override;
+public:
+	Bumper(double x, double y, int width, int height, Timer& timer, SDLWindow& window) : Object(x, y, timer, window), width(width), height(height) {}
+	void draw() override;
+};
