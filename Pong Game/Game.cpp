@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include <sstream>
 
 void Timer::tick() {
 	t2 = SDL_GetTicks();
@@ -23,7 +24,6 @@ void Game::run() {
 }
 
 void Game::mainLoop() {
-	ball.setVelocity(400, 400);
 	while (state == State::GAME) {
 		event();
 		updateWorld();
@@ -40,14 +40,19 @@ void Game::menuLoop() {
 
 void Game::endGameLoop() {
 	while (state == State::ENDG) {
-		draw();
+		drawEnd();
 		eventEndGame();
 	}
 }
 
 void Game::draw() {
 	window.drawBackground();
-	window.drawString(5, 2, "GAME", 40, Fonts::ARIAL, { 255, 255, 255 });
+	std::stringstream score;
+	score << "Highscore: " << counter.highscore;
+	window.drawString(5, 2, score.str(), 30, Fonts::ARIAL, { 255, 255, 255 });
+	score.str("");
+	score << "Score: " << counter.points;
+	window.drawString(5, 32, score.str(), 30, Fonts::ARIAL, { 255, 255, 255 });
 	ball.draw();
 	bumper.draw();
 	window.update();
@@ -73,7 +78,10 @@ void Game::event() {
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_ESCAPE:
-				state = State::EXIT;
+				state = State::ENDG;
+				break;
+			case SDLK_SPACE:
+				start();
 				break;
 			case SDLK_d:
 				bumper.setVelocity(300, 0);
@@ -146,5 +154,29 @@ void Game::eventMenu() {
 void Game::updateWorld() {
 	ball.move();
 	bumper.move();
+	if (ball.checkCollision(bumper)) {
+		counter.points++;
+	}
+	if (counter.points > counter.highscore) {
+		counter.highscore = counter.points;
+	}
+	if (ball.getY() > bumper.getY() + 10) {
+		counter.points = 0;
+		reset();
+	}
 	timer.tick();
+}
+void Game::reset() {
+	running = false;
+	ball.setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3);
+	ball.setVelocity(0, 0);
+	bumper.setPosition(BUMPER_START_X, BUMPER_START_Y);
+	bumper.setVelocity(0, 0);
+}
+void Game::start() {
+	if (!running) {
+		running = true;
+		int velX = rand() % 800 - 400;
+		ball.setVelocity(velX, 400);
+	}
 }
